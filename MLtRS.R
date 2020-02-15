@@ -21,10 +21,7 @@ library(mclust)
 ui <- fluidPage(
   
   navbarPage(title = "MLtRS",
-             tabPanel("Home",
-                      jumbotron("Hi Welcome to MLtRS", paste("This is web application for Machine Learning and AI! Right now application supports few techniques related to Supervised Learning."), buttonLabel = "Click Me" )
-                      
-             ),
+             
              tabPanel("Data Sets", 
                       sidebarLayout(
                         sidebarPanel(
@@ -308,65 +305,6 @@ ui <- fluidPage(
                         
                         
              ),
-             
-             navbarMenu("Unsupervised Learning",
-                        
-                        tabPanel("PCA",
-                                 sidebarLayout(
-                                   sidebarPanel(
-                                     selectInput("pcavar", "Select Variable", choices = "", selected = ""),
-                                     textInput("pcaprop", "Proportion", value = 0.8, placeholder = "Proportion for Training"),
-                                     textInput("pcanc", "Write Number of Components", value = 2, placeholder = "No. of Components"),
-                                     radioButtons("pcaoption", "Select Option", choices = c("No Option", "Table", "Show Prop.", "Components", "Fit", "Predictions", "Mod. Accuracy")) 
-                                   ),
-                                   mainPanel(
-                                     div(verbatimTextOutput("pcaoutput"))
-                                   )
-                                 )
-                        ),
-                        tabPanel("Gaussian Mixturre Modeling",
-                                 sidebarLayout(
-                                   sidebarPanel(
-                                     selectInput("gmvar", "Select Variable", choices = "", selected = ""),
-                                     textInput("gmprop", "Proportion", value = 0.8, placeholder = "Proportion for Training"),
-                                     radioButtons("gmoption", "Select Option", choices = c("No Option", "Table", "Data", "BIC", "Fit", "Summary", "Predictions-GMM", "HC")),
-                                     radioButtons("gmplottype", "Select Plot", choices = c("No Plot", "CLPairs", "BIC", "Classification", "Uncertainity", "HC"))
-                                   ),
-                                   mainPanel(
-                                     div(verbatimTextOutput("gmoutput")),
-                                     div(plotOutput("gmplot"))
-                                   )
-                                 )
-                                 ),
-                        tabPanel("Novelty & Outlier Detection",
-                                 sidebarLayout(
-                                   sidebarPanel(
-                                     textInput("mldata", "Select Dataset", value ="iris_anomaly", placeholder = "Dataset name"),
-                                     radioButtons("mloption", "Select Plot", choices = c("No Opt.", "Fit", "Memberships"))
-                                   ), 
-                                   mainPanel(
-                                     div(verbatimTextOutput("mloutput"))
-                                   )
-                                 )
-                                 ),
-                        tabPanel("Clustering (Fuzy C-Means Clustering)",
-                                 sidebarLayout(
-                                  sidebarPanel(
-                                    selectInput("fmcvar1", "Select Variable", choices = "", selected = ""),
-                                    selectInput("fmcvar2", "Select Variable", choices = "", selected = "", multiple = TRUE),
-                                    radioButtons("fmcoption", "Select Option", choices = c("No Opt.", "Fit", "Predictions")),
-                                    radioButtons("fmcplot", "Select Plot", choices = c("No Plot", "Plot"))
-                                  ),
-                                  mainPanel(
-                                    div(verbatimTextOutput("fmcoutput")),
-                                    div(plotOutput("fmcplot"))
-                                  )
-                                 )
-                                 
-                                 ),
-                        tabPanel("Manifold Learning (MDS)")
-             ),
-             
              tabPanel("Contact", 
                       sidebarLayout(
                         sidebarPanel(
@@ -1458,10 +1396,9 @@ server <- function(input, output, session) {
   # Contact Information 
   
   output$text1 <- renderText({
-    str1 <- paste("Dr. M. Kamakshaiah") 
-    str2 <- paste("kamakshaiah.m@gmail.com") 
-    str3 <- paste("+919177573730")
-    #str4 <- paste("166, Vayushakti Nagar, Dammaiguda, Hyderabad, Telangana State, India 500083")
+    str1 <- paste("Vishnu V U") 
+    str2 <- paste("optra7@gmail.com") 
+    str3 <- paste("+919562515945")
     HTML(paste(str1, str2, str3, sep = '<br/>'))
   })
   
