@@ -20,7 +20,7 @@ library(mclust)
 
 ui <- fluidPage(
   
-  navbarPage(title = "MLtRS",
+  navbarPage(title = "Air pollution",
              
              tabPanel("Data Sets", 
                       sidebarLayout(
@@ -30,7 +30,7 @@ ui <- fluidPage(
                           selectInput("cols", "Choose the variable", choices = "", selected = " ", multiple = TRUE), 
                           downloadButton('downloaddatset', "Download"),
                           hr(),
-                          radioButtons("trans1", "Transformation:", choices = c("Not-Required", "log", "inverselog", "exponential", "lognormal", "standardize")),
+                          radioButtons("trans1", "Transformation:", choices = c("Not-Required","standardize")),
                           hr()
                           
                         ), 
@@ -58,24 +58,6 @@ ui <- fluidPage(
                                    )
                                  )
                         ), 
-                        tabPanel("Frequency Tables",
-                                 sidebarLayout(
-                                   sidebarPanel(
-                                     selectInput("cols2", "Choose Varibale 1:", choices = "", selected = " ", multiple = TRUE),
-                                     selectInput("cols3", "Choose Varibale 2:", choices = "", selected = " ", multiple = TRUE)
-                                   ), 
-                                   mainPanel(
-                                     fluidRow(
-                                       h3("Frequency Tables"),
-                                       div(
-                                         verbatimTextOutput("freq_tables")
-                                       )
-                                     )
-                                   )
-                                 )
-                                 
-                        ), 
-                        
                         tabPanel("Plots",
                                  sidebarLayout(
                                    sidebarPanel(
@@ -94,36 +76,6 @@ ui <- fluidPage(
                                  )
                                  
                         ),
-                        
-                        tabPanel("Statistical Tests", 
-                                 sidebarLayout(
-                                   sidebarPanel(
-                                     selectInput("cols7", "Choose Varibale 1:", choices = "", selected = " ", multiple = TRUE),
-                                     selectInput("cols8", "Choose Varibale 2:", choices = "", selected = " ", multiple = TRUE),
-                                     radioButtons("normaltest", "Select Method:", choices = c("A-D-Test", "Shapiro", "KS-Test", "MV-Shapiro")),
-                                     hr(),
-                                     helpText("For more details visit:"),
-                                     a(href="https://en.wikipedia.org/wiki/Anderson%E2%80%93Darling_test", "Anderson–Darling test"), br(),
-                                     a(href="https://en.wikipedia.org/wiki/Shapiro%E2%80%93Wilk_test", "Shapiro–Wilk test"), br(),
-                                     a(href="https://en.wikipedia.org/wiki/Kolmogorov%E2%80%93Smirnov_test", "Kolmogorov–Smirnov test"), br(),
-                                     
-                                     hr()
-                                   ), 
-                                   mainPanel(
-                                     h3("Statistical Tests"),
-                                     fluidRow(
-                                       div(
-                                         plotOutput("qqp")
-                                       ),
-                                       div(
-                                         verbatimTextOutput("normtest")
-                                       )
-                                     )
-                                   )
-                                   
-                                 )
-                        ),
-                        
                         tabPanel("Correlation", 
                                  sidebarLayout(
                                    sidebarPanel(
@@ -144,19 +96,19 @@ ui <- fluidPage(
                                  
                         ),
                         
-                        tabPanel("Regression & ANOVA", 
+                        tabPanel("Regression", 
                                  sidebarLayout(
                                    sidebarPanel(
                                      selectInput("cols11", "Choose Variable:", choices = "", selected = " ", multiple = TRUE),
                                      selectInput("cols12", "Choose Variable:", choices = "", selected = " ", multiple = TRUE),
-                                     radioButtons("regmethod", "Select Method:", choices = c("Fit", "Summary", "ANOVA")), 
+                                     radioButtons("regmethod", "Select Method:", choices = c("Fit", "Summary")), 
                                      hr(),
                                      helpText("For more information please visit"),
                                      a(href="https://en.wikipedia.org/wiki/Simple_linear_regression", "Simple Linear Regression"),
                                      hr()
                                    ), 
                                    mainPanel(
-                                     h3("Regression & ANOVA"),
+                                     h3("Regression"),
                                      fluidRow(
                                        div(
                                          verbatimTextOutput("regout")
@@ -193,37 +145,7 @@ ui <- fluidPage(
                                    )
                                  )
                         ),
-                        
-                        tabPanel("kNN",
-                                 sidebarLayout(
-                                   sidebarPanel(
-                                     textInput("knntrain", "Select Proportion", value = 0.8, placeholder = "Percentage of rows"),
-                                     radioButtons("knnoption", "Select Option", choices = c("Show Prop.", "Show Train & Test Data", "Show No. of Classes", "Fit", "Accuracy")),
-                                     hr(),
-                                     helpText("First column of data set must be categorical/use '2. kNN_sepsis_numerical' from datasets for testing."),
-                                     a(href="https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm", "kNN")
-                                   ),
-                                   mainPanel(
-                                     div(verbatimTextOutput("knnoutput"))
-                                   )
-                                 )
-                        ),
-                        tabPanel("SVM",
-                                 sidebarLayout(
-                                   sidebarPanel(
-                                     selectInput("svmvar", "Select Variable", choices = "", selected = ""),
-                                     textInput("svmprop", "Select Proportion", value = 0.8, placeholder = "Percentage of rows"),
-                                     textInput("svmyname", "Class Variable", value = "num", placeholder = "Class Variable"),
-                                     radioButtons("svmoption", "Select Method", choices = c("Show Prop.", "Fit", "Predicted", "Pred. Accuracy")),
-                                     hr(),
-                                     helpText("Variable selected must be categorical. Use '1. logr_svm_heart_data' from datasets for testing."),
-                                     hr(),
-                                     a(href="http://mlwiki.org/index.php/Support_Vector_Machines", "SVM")
-                                   ),
-                                   mainPanel(verbatimTextOutput("svmoutput"))
-                                 )
-                        ),
-                        tabPanel("Decision Trees",
+                        tabPanel("Deep Learning",
                                  sidebarLayout(
                                    sidebarPanel(
                                      selectInput("dtvar", "Select Variable", choices = "", selected = ""),
@@ -262,7 +184,7 @@ ui <- fluidPage(
                                    )
                                  )
                         ),
-                        tabPanel("Naive Bayes Classifier",
+                        tabPanel("XGBoost",
                                  sidebarLayout(
                                    sidebarPanel(
                                      selectInput("nbvar", "Select Variable", choices = "", selected = ""),
@@ -281,7 +203,7 @@ ui <- fluidPage(
                                    )
                                  )
                         ),
-                        tabPanel("Neural Networks",
+                        tabPanel("CATBoost",
                                  sidebarLayout(
                                    sidebarPanel(
                                      selectInput("nnvar", "Select Variable", choices = "", selected = ""),
@@ -393,15 +315,6 @@ server <- function(input, output, session) {
       } else if(input$trans1 == "Not-Required"){
         data <- df[, input$cols]
         print(data)
-      } else if(input$trans1 == "log"){
-        logdata()
-        
-      } else if(input$trans1 == "inverselog"){
-        invlogdata()
-      } else if(input$trans1 == "exponential"){
-        expdata()
-      } else if(input$trans1 == "lognormal"){
-        logno()
       } else if(input$trans1 == "standardize"){
         standout()
       }
@@ -420,12 +333,6 @@ server <- function(input, output, session) {
       df <- data_input()
       if(input$trans1 == "log"){
         write.csv(logdata(), file, row.names = TRUE)
-      } else if(input$trans1 == "inverselog"){
-        write.csv(invlogdata(), file, row.names = TRUE)
-      } else if(input$trans1 == "exponential"){
-        write.csv(expdata(), file, row.names = TRUE)
-      } else if(input$trans1 == "lognormal"){
-        write.csv(logno(), file, row.names = TRUE)
       } else if(input$trans1 == "standardize"){
         write.csv(standout(), file, row.names = TRUE)
       }
