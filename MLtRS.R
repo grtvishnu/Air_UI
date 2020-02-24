@@ -17,7 +17,15 @@ library(NeuralNetTools)
 library(neuralnet)
 library(nnet)
 library(mclust)
-
+library(keras)
+library(mlbench) 
+library(dplyr)
+library(magrittr)
+library(neuralnet)
+library(tensorflow)
+library(randomForest)
+library(caret)
+library(BBmisc)
 ui <- fluidPage(
   
   navbarPage(title = "Air pollution",
@@ -148,14 +156,12 @@ ui <- fluidPage(
                         tabPanel("Deep Learning",
                                  sidebarLayout(
                                    sidebarPanel(
-                                     selectInput("dtvar", "Select Variable", choices = "", selected = ""),
-                                     selectInput("dtvar2", "Select Variable", choices = "", selected = "", multiple = TRUE),
-                                     textInput("dtprop", "Select Proportion", value = 0.8, placeholder = "Percentage of rows"),
-                                     textInput("dtyname", "Class Variable", value = "num", placeholder = "Class Variable"),
+                                     selectInput("dtyname", "Select Variable", choices = "", selected = ""),
+                                     textInput("dtprop", "Select Proportion", value = 0.7, placeholder = "Percentage of rows"),
                                      radioButtons("dtoption", "Select Method", choices = c("No Option", "Table", "Show Prop.", "Train & Test Data", "Fit", "Predicted", "Pred. Accuracy")), 
                                      radioButtons("dtplot", "Select Plot", choices = c("No Plot", "QPlot", "DTree")),
                                      hr(),
-                                     helpText("Variable selected must be categorical and numerical. Use '4. DT_breast_cancer.csv' from datasets for testing."),
+                                     helpText("Variable selected must be categorical and numerical."),
                                      hr(),
                                      a(href="http://mlwiki.org/index.php/Decision_Tree_Exercises", "Decision Trees")
                                    ),
@@ -316,7 +322,9 @@ server <- function(input, output, session) {
         data <- df[, input$cols]
         print(data)
       } else if(input$trans1 == "standardize"){
-        standout()
+        data <- df[, input$cols]
+        normalize(data)
+        print(data)
       }
       
     }
@@ -783,21 +791,31 @@ server <- function(input, output, session) {
   # DECISION TREE
   
   observeEvent(input$file1, {
-    updateSelectInput(session, inputId = "dtvar", choices = names(data_input()))
-    updateSelectInput(session, inputId = "dtvar2", choices = names(data_input()))
+    updateSelectInput(session, inputId = "dtyname", choices = names(data_input()))
   }
   )
   
   dtout <- reactive({
     
     df <- data_input()
-    tab = table(df[, input$dtvar])
+    tab = table(df[, input$dtyname])
     
     if (input$dtoption == "Table"){
       return(tab)
     }
-    
-    index = createDataPartition(y=df[, input$dtvar], p=0.7, list=FALSE)
+    # # Matrix
+    # air <- as.matrix(air)
+    # dimnames(air) <- NULL
+    # 
+    # # Partition
+    # set.seed(1234)
+    # ind <- sample(2, nrow(air), replace = T, prob = c(.7, .3))
+    # training <- air[ind==1,1:5]
+    # test <- air[ind==2, 1:5]
+    # trainingtarget <- air[ind==1, 6]
+    # testtarget <- air[ind==2, 6]
+    # 
+    index = createDataPartition(y=df[, input$dtyname], p=0.7, list=FALSE)
     
     train.set = df[index,]
     test.set = df[-index,]
@@ -812,7 +830,7 @@ server <- function(input, output, session) {
     
     var <- input$dtvar
     
-    brest.tree = train(as.formula(paste(var, "~", ".")),
+    brest.tree = train(as.formula(paste(PM25, "~", ".")),
                        data=train.set,
                        method="rpart",
                        trControl = trainControl(method = "cv"))
@@ -906,7 +924,8 @@ server <- function(input, output, session) {
     
     rf_pred <- predict(rf_fit, test_set)
     
-    out <- confusionMatrix(round(rf_pred), as.numeric(test_set[, input$rfvar]))
+    out <- rmse(log(input$rfvar),log(rf_pre))
+    #out <- confusionMatrix(round(rf_pred), as.numeric(test_set[, input$rfvar]))
 
     if (input$rfoption == "Predicted"){
       return(data.frame(rf_pred))
