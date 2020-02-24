@@ -69,7 +69,7 @@ ui <- fluidPage(
                         tabPanel("Plots",
                                  sidebarLayout(
                                    sidebarPanel(
-                                     radioButtons("plotoption", "Choose the Option:", choices = c("Histogram", "BarPlot", "Scatter", "Pie" )),
+                                     radioButtons("plotoption", "Choose the Option:", choices = c("Histogram", "BarPlot", "Scatter" )),
                                      selectInput("cols6", "Choose Varibale 1:", choices = "", selected = " ", multiple = TRUE),
                                      textInput("xaxisname", "Write X Axis Name"),
                                      textInput("yaxisname", "Write Y Axis Name"),
@@ -98,33 +98,6 @@ ui <- fluidPage(
                                    mainPanel(
                                      h3("Covariance & Correlation"),
                                      verbatimTextOutput("cor_t")
-                                   )
-                                   
-                                 )
-                                 
-                        ),
-                        
-                        tabPanel("Regression", 
-                                 sidebarLayout(
-                                   sidebarPanel(
-                                     selectInput("cols11", "Choose Variable:", choices = "", selected = " ", multiple = TRUE),
-                                     selectInput("cols12", "Choose Variable:", choices = "", selected = " ", multiple = TRUE),
-                                     radioButtons("regmethod", "Select Method:", choices = c("Fit", "Summary")), 
-                                     hr(),
-                                     helpText("For more information please visit"),
-                                     a(href="https://en.wikipedia.org/wiki/Simple_linear_regression", "Simple Linear Regression"),
-                                     hr()
-                                   ), 
-                                   mainPanel(
-                                     h3("Regression"),
-                                     fluidRow(
-                                       div(
-                                         verbatimTextOutput("regout")
-                                       ),
-                                       div(
-                                         plotOutput("regplot")
-                                       )
-                                     )
                                    )
                                    
                                  )
@@ -180,7 +153,7 @@ ui <- fluidPage(
                                      textInput("rfyname", "Class Variable", value = "old", placeholder = "Class Variable"),
                                      radioButtons("rfoption", "Select Method", choices = c("No Option", "Table", "Show Prop.", "Train & Test Data", "Fit", "Summary", "Predicted", "Pred. Accuracy")),
                                      hr(),
-                                     helpText("Variable selected must be categorical and numerical. Use '5. RF_abalone_short.csv' from datasets for testing."),
+                                     helpText("Variable selected must be categorical and numerical."),
                                      hr(),
                                      a(href="https://en.wikipedia.org/wiki/Random_forest", "Random Forest")
                                    ),
@@ -199,7 +172,7 @@ ui <- fluidPage(
                                      textInput("nbyname", "Class Variable", value = "sepsis", placeholder = "Class Variable"),
                                      radioButtons("nboption", "Select Method", choices = c("No Option", "Table", "Show Prop.", "Train & Test Data", "Fit", "Summary", "Predicted", "Pred. Accuracy")),
                                      hr(),
-                                     helpText("Variable selected must be categorical and numerical. Use '6. Naive_Bayes_sepsis.csv' from datasets for testing."),
+                                     helpText("Variable selected must be categorical and numerical."),
                                      hr(),
                                      a(href="https://en.wikipedia.org/wiki/Naive_Bayes_classifier", "Naive Bayes Classifier")
                                    ),
@@ -220,7 +193,7 @@ ui <- fluidPage(
                                      radioButtons("nnoption", "Select Method", choices = c("No Option", "Table", "Show Prop.", "Train & Test Data", "Fit", "Summary", "Predictions", "Pred. Accuracy", "Plot")),
                                      # radioButtons("nnplottype", "Select Plot", choices = c("No Plot", "Weight Decay", "Network Plot")),
                                      hr(),
-                                     helpText("Variable selected must be categorical and numerical. Use '7. NN_prostrate.csv' from datasets for testing."),
+                                     helpText("Variable selected must be categorical and numerical."),
                                      hr(),
                                      a(href="http://mlwiki.org/index.php/Neural_Networks", "Neural Networks")
                                    ),
@@ -441,10 +414,8 @@ server <- function(input, output, session) {
       hist(df[, input$cols6], freq = FALSE, xlab = input$xaxisname, ylab = input$yaxisname, main = input$title); lines(density(df[, input$cols6]), col = "red", lwd = 1.5)
     } else if(input$plotoption == "BarPlot"){
       barplot(df[, input$cols6], xlab = input$xaxisname, ylab = input$yaxisname, main = input$title)
-    } else if(input$plotoption == "Scatter"){
+    } else if (input$plotoption == "Scatter"){
       scatter.smooth(df[, input$cols6], xlab = input$xaxisname, ylab = input$yaxisname, main = input$title)
-    } else {
-      pie(table(df[, input$cols6]))
     }
   })
   
