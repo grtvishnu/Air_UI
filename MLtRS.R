@@ -108,24 +108,6 @@ ui <- fluidPage(
              
              navbarMenu("Supervised Learning",
                         
-                        tabPanel("Logistic Reg.",
-                                 
-                                 sidebarLayout(
-                                   sidebarPanel(
-                                     selectInput("logrvar", "Select Variable", choices = "", selected = ""),
-                                     textInput("logrprop", "Select Proportion", value = 0.8, placeholder = "Percentage of rows"),
-                                     # textInput("logryname", "Class Variable", value = "num", placeholder = "Class Variable"),
-                                     radioButtons("logroption", "Select Method", choices = c("Show Prop.", "Fit", "Coef.", "Pred. Accuracy")),
-                                     hr(),
-                                     helpText("Variable selected must be categorical. Use '1. logr_svm_heart_data' from datasets for testing."), 
-                                     hr(),
-                                     a(href="http://mlwiki.org/index.php/Logistic_Regression", "Logistic Regression")
-                                   ),
-                                   mainPanel(
-                                     div(verbatimTextOutput("logroutput"))
-                                   )
-                                 )
-                        ),
                         tabPanel("Deep Learning",
                                  sidebarLayout(
                                    sidebarPanel(
@@ -1293,9 +1275,10 @@ server <- function(input, output, session) {
   # Contact Information 
   
   output$text1 <- renderText({
-    str1 <- paste("Vishnu V U") 
-    str2 <- paste("optra7@gmail.com") 
-    str3 <- paste("+919562515945")
+    str1 <- paste("LUCKY THIRTEEN") 
+    str2 <- paste("Vishnu V U, Teslin Rose, Vini, Sruthi") 
+    str3 <- paste("***********************")
+    
     HTML(paste(str1, str2, str3, sep = '<br/>'))
   })
   
