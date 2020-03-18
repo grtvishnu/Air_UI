@@ -25,6 +25,7 @@ library(neuralnet)
 library(tensorflow)
 library(randomForest)
 library(caret)
+library(Metrics)
 library(BBmisc)
 ui <- fluidPage(
   
@@ -132,10 +133,9 @@ ui <- fluidPage(
                                      selectInput("rfvar", "Select Variable", choices = "", selected = ""),
                                      
                                      textInput("rfprop", "Select Proportion", value = 0.8, placeholder = "Percentage of rows"),
-                                     textInput("rfyname", "Class Variable", value = "old", placeholder = "Class Variable"),
                                      radioButtons("rfoption", "Select Method", choices = c("No Option", "Table", "Show Prop.", "Train & Test Data", "Fit", "Summary", "Predicted", "Pred. Accuracy")),
                                      hr(),
-                                     helpText("Variable selected must be categorical and numerical."),
+                                     helpText("Variable selected must be Non NA ."),
                                      hr(),
                                      a(href="https://en.wikipedia.org/wiki/Random_forest", "Random Forest")
                                    ),
@@ -847,11 +847,10 @@ server <- function(input, output, session) {
     }
     
     # train_index <- sample(1:nrow(df), as.numeric(input$rfprop) * nrow(df))
-    
-    prop <- as.numeric(input$rfprop)
-    
-    train_set <- df[1:(nrow(df)*prop),]
-    test_set <- df[-(1:(nrow(df)*prop)),]
+    set.seed(1234)
+    ind <- sample(2, nrow(df), replace = T, prob = c(.8, .2))
+    train_set <- df[ind==1, ]
+    test_set <- df[ind==2, ]
     
     
     if (input$rfoption == "Show Prop."){
@@ -864,8 +863,8 @@ server <- function(input, output, session) {
     }
     
     var <- input$rfvar
+    rf_fit <- randomForest(as.formula(paste(var, "~", ".")), data = train_set, importance = TRUE, proximity = TRUE)
     
-    rf_fit <- randomForest::randomForest(as.formula(paste(var, "~", ".")), data = train_set, importance = TRUE, proximity = TRUE)
     
     if (input$rfoption == "Fit"){
       return(rf_fit)
@@ -877,8 +876,8 @@ server <- function(input, output, session) {
     
     rf_pred <- predict(rf_fit, test_set)
     
-    out <- rmse(log(input$rfvar),log(rf_pre))
-    #out <- confusionMatrix(round(rf_pred), as.numeric(test_set[, input$rfvar]))
+    out <- RMSE(rf_pred, var, na.rm = T)
+    
 
     if (input$rfoption == "Predicted"){
       return(data.frame(rf_pred))
