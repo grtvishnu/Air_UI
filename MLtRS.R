@@ -863,7 +863,7 @@ server <- function(input, output, session) {
     }
     
     var <- input$rfvar
-    rf_fit <- randomForest(as.formula(paste(var, "~", ".")), data = train_set, importance = TRUE, proximity = TRUE)
+    rf_fit <- randomForest(as.formula(paste(var, "~", ".")), data = train_set, importance = TRUE, proximity = TRUE, mtry =10, ntree = 500)
     
     
     if (input$rfoption == "Fit"){
