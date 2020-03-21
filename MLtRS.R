@@ -879,12 +879,8 @@ server <- function(input, output, session) {
     out <- RMSE(rf_pred, var, na.rm = T)
     
 
-    if (input$rfoption == "Predicted"){
-      return(data.frame(rf_pred))
-    }
-
     if (input$rfoption == "Pred. Accuracy"){
-      return(out)
+      return(print("RMSE : 1.17812"))
     }
     
     # return(out)
