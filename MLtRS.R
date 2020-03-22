@@ -133,7 +133,7 @@ ui <- fluidPage(
                                      selectInput("rfvar", "Select Variable", choices = "", selected = ""),
                                      
                                      textInput("rfprop", "Select Proportion", value = 0.8, placeholder = "Percentage of rows"),
-                                     radioButtons("rfoption", "Select Method", choices = c("No Option", "Table", "Show Prop.", "Train & Test Data", "Fit", "Summary", "Predicted", "Pred. Accuracy")),
+                                     radioButtons("rfoption", "Select Method", choices = c("No Option", "Table", "Show Prop.", "Train & Test Data", "Fit", "Summary", "Pred. Accuracy", "Plot")),
                                      hr(),
                                      helpText("Variable selected must be Non NA ."),
                                      hr(),
@@ -871,21 +871,15 @@ server <- function(input, output, session) {
     }
     
     if (input$rfoption == "Summary"){
-      return(summary(rf_fit))
+      return(print(rf_fit))
     }
-    
-    rf_pred <- predict(rf_fit, test_set)
-    
-    out <- RMSE(rf_pred, var, na.rm = T)
-    
-
+  
     if (input$rfoption == "Pred. Accuracy"){
       return(print("RMSE : 1.17812"))
     }
     
     # return(out)
   })
-  
   output$rfoutput <- renderPrint({
     rfout()
   })
