@@ -133,7 +133,7 @@ ui <- fluidPage(
                                      selectInput("rfvar", "Select Variable", choices = "", selected = ""),
                                      
                                      textInput("rfprop", "Select Proportion", value = 0.8, placeholder = "Percentage of rows"),
-                                     radioButtons("rfoption", "Select Method", choices = c("No Option", "Table", "Show Prop.", "Train & Test Data", "Fit", "Summary", "Pred. Accuracy", "Plot")),
+                                     radioButtons("rfoption", "Select Method", choices = c("No Option", "Table", "Show Prop.", "Train & Test Data", "Fit", "Summary", "Pred. Accuracy", "Plot", "Accuracy")),
                                      hr(),
                                      helpText("Variable selected must be Non NA ."),
                                      hr(),
@@ -880,10 +880,33 @@ server <- function(input, output, session) {
     
     # return(out)
   })
+  output$image2 <- renderImage({
+    if (is.null(input$picture))
+      return(NULL)
+    
+    if (input$rfoption == "Plot") {
+      return(list(
+        src = "Rplot.png",
+        contentType = "image/png",
+        alt = "Plot"
+      ))
+    } else if (input$rfoption == "Accuracy") {
+      return(list(
+        src = "Rplot1.png",
+        filetype = "image/png",
+        alt = "Accuracy"
+      ))
+    }
+    
+  }, deleteFile = FALSE)
+
   output$rfoutput <- renderPrint({
     rfout()
   })
   
+  
+ 
+
   # NAIVE BAYES
   
   observeEvent(input$file1, {
