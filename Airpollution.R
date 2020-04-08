@@ -125,7 +125,7 @@ ui <- fluidPage(
              
              navbarMenu("Supervised Learning",
                         
-                        tabPanel("Deep Learning",
+                        tabPanel("CaTBoost",
                                  sidebarLayout(
                                    sidebarPanel(
                                      selectInput("dtyname", "Select Variable", choices = "", selected = ""),
@@ -179,7 +179,7 @@ ui <- fluidPage(
                                    )
                                  )   
                         ),
-                        tabPanel("CATBoost",
+                        tabPanel("Deep Learning",
                                  sidebarLayout(
                                    sidebarPanel(
                                      selectInput("nnvar", "Select Variable", choices = "", selected = ""),
@@ -985,6 +985,8 @@ server <- function(input, output, session) {
   output$nboutput <- renderPrint({
     nbout()
   })
+  
+  
   # NEURAL NETWORKS
   
   observeEvent(input$file1, {
