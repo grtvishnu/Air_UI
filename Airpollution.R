@@ -27,6 +27,22 @@ library(randomForest)
 library(caret)
 library(Metrics)
 library(BBmisc)
+library(MASS)
+library(Metrics)
+library(corrplot)
+library(randomForest)
+library(lars)
+library(ggplot2)
+library(xgboost)
+library(Matrix)
+library(methods)
+library(caret)
+library(tidyverse)
+library(mlr)
+library(data.table)
+library(caret)
+library(lubridate)
+library(scales)
 ui <- fluidPage(
   
   navbarPage(title = "Air pollution",
@@ -133,7 +149,7 @@ ui <- fluidPage(
                                      selectInput("rfvar", "Select Variable", choices = "", selected = ""),
                                      
                                      textInput("rfprop", "Select Proportion", value = 0.8, placeholder = "Percentage of rows"),
-                                     radioButtons("rfoption", "Select Method", choices = c("No Option", "Show Prop.", "Train & Test Data", "Model Summary", "Pred. Accuracy", "Plot")),
+                                     radioButtons("rfoption", "Select Method", choices = c("No Option", "Show Prop.", "Train & Test Data", "Summary", "Pred. Accuracy", "Plot")),
                                      hr(),
                                      helpText("Variable selected must be Non NA ."),
                                      hr(),
@@ -151,18 +167,17 @@ ui <- fluidPage(
                                      selectInput("nbvar", "Select Variable", choices = "", selected = ""),
                                      
                                      textInput("nbprop", "Select Proportion", value = 0.8, placeholder = "Percentage of rows"),
-                                     textInput("nbyname", "Class Variable", value = "sepsis", placeholder = "Class Variable"),
-                                     radioButtons("nboption", "Select Method", choices = c("No Option", "Table", "Show Prop.", "Train & Test Data", "Fit", "Summary", "Predicted", "Pred. Accuracy")),
+                                     radioButtons("nboption", "Select Method", choices = c("No Option", "Show Prop.", "Train & Test Data", "Summary","Predicted", "Pred. Accuracy", "Plot")),
                                      hr(),
-                                     helpText("Variable selected must be categorical and numerical."),
+                                     helpText("Variable selected must be Non NA ."),
                                      hr(),
-                                     a(href="https://en.wikipedia.org/wiki/Naive_Bayes_classifier", "Naive Bayes Classifier")
+                                     a(href="https://en.wikipedia.org/wiki/XGBoost", "XGBoost")
                                    ),
                                    mainPanel(
                                      div(verbatimTextOutput("nboutput"))
                                      
                                    )
-                                 )
+                                 )   
                         ),
                         tabPanel("CATBoost",
                                  sidebarLayout(
@@ -856,6 +871,8 @@ server <- function(input, output, session) {
     train_set <- df[ind==1, ]
     test_set <- df[ind==2, ]
     
+    ts_labels <- df[ind == 2, 11]
+    
     
     if (input$rfoption == "Show Prop."){
       return(dim(train_set)[1]/dim(df)[1])
@@ -879,7 +896,7 @@ server <- function(input, output, session) {
     }
     
     if (input$rfoption == "Pred. Accuracy"){
-      return(print("RMSE : 1.17812"))
+      return(RMSE(p1, ts_labels))
     }
     
     # return(out)
@@ -911,7 +928,7 @@ server <- function(input, output, session) {
   
   
   
-  # NAIVE BAYES
+  # XGBoost
   
   observeEvent(input$file1, {
     updateSelectInput(session, inputId = "nbvar", choices = names(data_input()))
@@ -922,47 +939,52 @@ server <- function(input, output, session) {
     df <- data_input()
     
     
-    trainIndex <- createDataPartition(df[, input$nbvar], p=as.numeric(input$nbprop), list=FALSE)
+    set.seed(1234)
+    ind <- sample(2, nrow(df), replace = T, prob = c(.8, .2))
+    train <- df[ind==1, ]
+    test <- df[ind==2, ]
     
-    data_train <- df[ trainIndex,]
-    data_test <- df[-trainIndex,]
+    t_train <- setDT(train)
+    t_test <- setDT(test)
+    labels <- df[ind == 1, 8]
+    ts_labels <- df[ind == 2, 8]
+    
+    dtrain <- xgb.DMatrix(label = labels, data = as.matrix(train))
+    dtest <- xgb.DMatrix(label = ts_labels, data = as.matrix(test))
     
     if (input$nboption == "Table"){
       return(table(df[, input$nbvar]))
     }
     
     if (input$nboption == "Show Prop."){
-      return(dim(data_train)[1]/dim(df)[1])
+      return(dim(train)[1]/dim(df)[1])
     }
     
     if (input$nboption == "Train & Test Data"){
-      return(list(head(data_train), head(data_test)))
+      return(list(head(train), head(test)))
     }
     
-    # train a naive bayes model
-    model <- NaiveBayes(as.factor(sepsis)~., data=data_train)
+    # train a xgb
+    model <- readRDS("xgb.rds")
     
-    if (input$nboption == "Fit"){
-      return(model)
+    if (input$nboption == "Summary"){
+      return(print(model))
     }
     
-    predictions <- predict(model, x_test)
+    predictions <- predict(model, dtest)
     
     if (input$nboption == "Predicted"){
       return(predictions)
     }
-    # summarize results
-    out <- confusionMatrix(predictions$class, data_test[, "sepsis"])
-    
+
     if (input$nboption == "Pred. Accuracy"){
-      return(out)
+      return(RMSE(predictions, ts_labels))
     }
   })
   
   output$nboutput <- renderPrint({
     nbout()
   })
-  
   # NEURAL NETWORKS
   
   observeEvent(input$file1, {
