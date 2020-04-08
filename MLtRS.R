@@ -393,7 +393,11 @@ server <- function(input, output, session) {
   output$plot <- renderPlot({
     df <- data_input()
     if(input$plotoption == "Histogram"){
-      hist(df[, input$cols6], freq = FALSE, xlab = input$xaxisname, ylab = input$yaxisname, main = input$title); lines(density(df[, input$cols6]), col = "red", lwd = 1.5)
+      ggplot(data = df, aes(x= df[, input$cols6])) +
+        geom_histogram() +
+        xlab(input$xaxisname)+
+        ylab(input$yaxisname)+
+        ggtitle(input$title)
     } else if(input$plotoption == "BarPlot"){
       barplot(df[, input$cols6], xlab = input$xaxisname, ylab = input$yaxisname, main = input$title)
     } else if (input$plotoption == "Scatter"){
@@ -625,14 +629,14 @@ server <- function(input, output, session) {
     rows <- round(as.numeric(input$knntrain)*dim(df)[1])
     
     if(input$knnoption == "Show Prop."){
-     return(rows)  
+      return(rows)  
     }
     
     lascol <- dim(df)[2]
     
     train_data <- df[1:rows, 2:lascol]
     test_data <- df[-(1:rows), 2:lascol]
-     
+    
     if(input$knnoption == "Show Train & Test Data"){
       return(list(head(train_data), head(test_data)))
     }
@@ -857,7 +861,7 @@ server <- function(input, output, session) {
       return(dim(train_set)[1]/dim(df)[1])
     }
     
-  
+    
     if (input$rfoption == "Train & Test Data"){
       return(list(head(train_set), head(test_set), dim(train_set), dim(test_set)))
     }
@@ -873,7 +877,7 @@ server <- function(input, output, session) {
     if (input$rfoption == "Summary"){
       return(print(rf_fit))
     }
-  
+    
     if (input$rfoption == "Pred. Accuracy"){
       return(print("RMSE : 1.17812"))
     }
@@ -899,14 +903,14 @@ server <- function(input, output, session) {
     }
     
   }, deleteFile = FALSE)
-
+  
   output$rfoutput <- renderPrint({
     rfout()
   })
   
   
- 
-
+  
+  
   # NAIVE BAYES
   
   observeEvent(input$file1, {
@@ -993,7 +997,7 @@ server <- function(input, output, session) {
       layer1 = hl1, 
       layer2 = hl2,
       layer3 = 1
-      )
+    )
     
     model <- train(as.formula(paste(var, "~", ".")), train.set, method="nnet", trace = FALSE)
     # model <- neuralnet(as.formula(paste(var, "~", ".")), data=train.set, hidden = c(5, 3), linear.output=T)
@@ -1028,7 +1032,7 @@ server <- function(input, output, session) {
     # if (input$nnplottype == "Network Plot"){
     #   plotnet(model)
     # }
-    })
+  })
   
   
   output$nnoutput <- renderPrint({
@@ -1127,7 +1131,7 @@ server <- function(input, output, session) {
     if (input$gmoption == "Data"){
       return(head(X))
     }
-
+    
     if (input$gmplottype == "CLPairs"){
       clPairs(X, class)
     }
@@ -1143,7 +1147,7 @@ server <- function(input, output, session) {
     }
     
     mod1 <- Mclust(X, x = BIC)
-
+    
     if (input$gmoption == "Fit"){
       return(mod1)
     }
@@ -1207,7 +1211,7 @@ server <- function(input, output, session) {
     
   })
   
- 
+  
   
   # ANOMALY DETECTION (in testing with iris data set)
   
@@ -1234,11 +1238,11 @@ server <- function(input, output, session) {
   
   output$mloutput <- renderPrint({
     if (input$mloption == "Fit"){
-     mlout()
+      mlout()
     } else if (input$mloption == "Predictions"){
       mlout()
-      }
     }
+  }
   )
   
   
