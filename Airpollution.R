@@ -133,7 +133,7 @@ ui <- fluidPage(
                                      selectInput("rfvar", "Select Variable", choices = "", selected = ""),
                                      
                                      textInput("rfprop", "Select Proportion", value = 0.8, placeholder = "Percentage of rows"),
-                                     radioButtons("rfoption", "Select Method", choices = c("No Option", "Table", "Show Prop.", "Train & Test Data", "Fit", "Summary", "Pred. Accuracy", "Plot", "Accuracy")),
+                                     radioButtons("rfoption", "Select Method", choices = c("No Option", "Show Prop.", "Train & Test Data", "Model Summary", "Pred. Accuracy", "Plot")),
                                      hr(),
                                      helpText("Variable selected must be Non NA ."),
                                      hr(),
@@ -867,8 +867,8 @@ server <- function(input, output, session) {
     }
     
     var <- input$rfvar
-    rf_fit <- randomForest(as.formula(paste(var, "~", ".")), data = train_set, importance = TRUE, proximity = TRUE, mtry =10, ntree = 500)
-    
+    rf_fit <- readRDS("random_forest.rds")
+    p1 <- predict(rf_fit, test_set)
     
     if (input$rfoption == "Fit"){
       return(rf_fit)
