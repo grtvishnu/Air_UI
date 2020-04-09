@@ -801,19 +801,19 @@ server <- function(input, output, session) {
   
   output$plot <- renderPlot({
     df <- data_input()
-    if(input$pplotoption == "Histogram"){
+    if(input$pplotoption == "Chennai"){
       ggplot(data = df, aes(x= df[, input$cols6])) +
         geom_histogram() +
         xlab(input$xaxisname)+
         ylab(input$yaxisname)+
         ggtitle(input$title)
-    } else if(input$pplotoption == "BarPlot"){
+    } else if(input$pplotoption == "Delhi"){
       barplot(df[, input$cols6], xlab = input$xaxisname, ylab = input$yaxisname, main = input$title)
-    } else if (input$pplotoption == "Scatter"){
+    } else if (input$pplotoption == "Hydrabad"){
       scatter.smooth(df[, input$cols6], xlab = input$xaxisname, ylab = input$yaxisname, main = input$title)
-    } else if (input$pplotoption == "Scatter"){
+    } else if (input$pplotoption == "Kolkata"){
       scatter.smooth(df[, input$cols6], xlab = input$xaxisname, ylab = input$yaxisname, main = input$title)
-    } else if (input$pplotoption == "Scatter"){
+    } else if (input$pplotoption == "Mumbai"){
       scatter.smooth(df[, input$cols6], xlab = input$xaxisname, ylab = input$yaxisname, main = input$title)
     }
   })
