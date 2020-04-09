@@ -1,5 +1,6 @@
 library(shiny)
-library(shinydashboard)        
+library(shinydashboard)    
+library(tidyverse)
 library(nortest)
 library(mvnormtest)
 library(MASS)
@@ -19,31 +20,28 @@ library(nnet)
 library(mclust)
 library(keras)
 library(mlbench) 
-library(dplyr)
-library(magrittr)
-library(neuralnet)
 library(tensorflow)
 library(randomForest)
-library(caret)
 library(Metrics)
 library(BBmisc)
-library(MASS)
-library(Metrics)
 library(corrplot)
-library(randomForest)
 library(lars)
 library(ggplot2)
 library(xgboost)
 library(Matrix)
 library(methods)
-library(caret)
 library(tidyverse)
 library(mlr)
 library(data.table)
-library(caret)
 library(lubridate)
 library(scales)
+library(dashboardthemes)
+library(shinythemes)
+library(plotly)
+library(flexdashboard)
 ui <- fluidPage(
+  theme = shinytheme("cosmo"),
+  
   
   navbarPage(title = "Air pollution",
              
@@ -201,6 +199,40 @@ ui <- fluidPage(
                                  )
                         )
                         
+                        
+             ),
+             navbarMenu("Forecast",
+                        tabPanel("Visualize",
+                                 sidebarLayout(
+                                   sidebarPanel(
+                                     selectInput("cols1", "Choose Variable:", choices = "", selected = " ", multiple = TRUE),
+                                     radioButtons("ssoption", "Select Option", choices = c("Chennai","Delhi", "Hydrabad", "Kolkata", "Mumbai"))
+                                     
+                                   ), 
+                                   mainPanel(
+                                     fluidRow(
+                                       h3("Visualize"),
+                                       div(
+                                         verbatimTextOutput("summar")
+                                       )
+                                     )
+                                   )
+                                 )
+                        ), 
+                        tabPanel("Plots",
+                                 sidebarLayout(
+                                   sidebarPanel(
+                                     radioButtons("pplotoption", "Choose the Option:", choices = c("Chennai","Delhi", "Hydrabad", "Kolkata", "Mumbai")),
+                                   ), 
+                                   mainPanel(
+                                     h3("Plots"),
+                                     fluidRow(
+                                       plotOutput("plot")
+                                     )
+                                   )
+                                 )
+                                 
+                        )
                         
              ),
              tabPanel("Contact", 
@@ -759,6 +791,33 @@ server <- function(input, output, session) {
     }
     
   })
+  
+  #forecast
+  
+  observeEvent(input$file1, {
+    updateSelectInput(session, inputId = "ccols6", choices = names(data_input()))
+  }
+  )
+  
+  output$plot <- renderPlot({
+    df <- data_input()
+    if(input$pplotoption == "Histogram"){
+      ggplot(data = df, aes(x= df[, input$cols6])) +
+        geom_histogram() +
+        xlab(input$xaxisname)+
+        ylab(input$yaxisname)+
+        ggtitle(input$title)
+    } else if(input$pplotoption == "BarPlot"){
+      barplot(df[, input$cols6], xlab = input$xaxisname, ylab = input$yaxisname, main = input$title)
+    } else if (input$pplotoption == "Scatter"){
+      scatter.smooth(df[, input$cols6], xlab = input$xaxisname, ylab = input$yaxisname, main = input$title)
+    } else if (input$pplotoption == "Scatter"){
+      scatter.smooth(df[, input$cols6], xlab = input$xaxisname, ylab = input$yaxisname, main = input$title)
+    } else if (input$pplotoption == "Scatter"){
+      scatter.smooth(df[, input$cols6], xlab = input$xaxisname, ylab = input$yaxisname, main = input$title)
+    }
+  })
+  
   
   # DECISION TREE
   
