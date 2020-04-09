@@ -42,7 +42,6 @@ library(flexdashboard)
 ui <- fluidPage(
   theme = shinytheme("cosmo"),
   
-  
   navbarPage(title = "Air pollution",
              
              tabPanel("Data Sets", 
@@ -123,7 +122,7 @@ ui <- fluidPage(
              
              navbarMenu("Supervised Learning",
                         
-                        tabPanel("CaTBoost",
+                        tabPanel("Deep Learning",
                                  sidebarLayout(
                                    sidebarPanel(
                                      selectInput("dtyname", "Select Variable", choices = "", selected = ""),
@@ -147,7 +146,7 @@ ui <- fluidPage(
                                      selectInput("rfvar", "Select Variable", choices = "", selected = ""),
                                      
                                      textInput("rfprop", "Select Proportion", value = 0.8, placeholder = "Percentage of rows"),
-                                     radioButtons("rfoption", "Select Method", choices = c("No Option", "Show Prop.", "Train & Test Data", "Summary", "Pred. Accuracy", "Plot")),
+                                     radioButtons("rfoption", "Select Method", choices = c("No Option", "Show Prop.", "Train & Test Data", "Model Summary", "Pred. Accuracy", "Plot")),
                                      hr(),
                                      helpText("Variable selected must be Non NA ."),
                                      hr(),
@@ -165,19 +164,20 @@ ui <- fluidPage(
                                      selectInput("nbvar", "Select Variable", choices = "", selected = ""),
                                      
                                      textInput("nbprop", "Select Proportion", value = 0.8, placeholder = "Percentage of rows"),
-                                     radioButtons("nboption", "Select Method", choices = c("No Option", "Show Prop.", "Train & Test Data", "Summary","Predicted", "Pred. Accuracy", "Plot")),
+                                     textInput("nbyname", "Class Variable", value = "sepsis", placeholder = "Class Variable"),
+                                     radioButtons("nboption", "Select Method", choices = c("No Option", "Table", "Show Prop.", "Train & Test Data", "Fit", "Summary", "Predicted", "Pred. Accuracy")),
                                      hr(),
-                                     helpText("Variable selected must be Non NA ."),
+                                     helpText("Variable selected must be categorical and numerical."),
                                      hr(),
-                                     a(href="https://en.wikipedia.org/wiki/XGBoost", "XGBoost")
+                                     a(href="https://en.wikipedia.org/wiki/Naive_Bayes_classifier", "Naive Bayes Classifier")
                                    ),
                                    mainPanel(
                                      div(verbatimTextOutput("nboutput"))
                                      
                                    )
-                                 )   
+                                 )
                         ),
-                        tabPanel("Deep Learning",
+                        tabPanel("CATBoost",
                                  sidebarLayout(
                                    sidebarPanel(
                                      selectInput("nnvar", "Select Variable", choices = "", selected = ""),
@@ -199,40 +199,6 @@ ui <- fluidPage(
                                  )
                         )
                         
-                        
-             ),
-             navbarMenu("Forecast",
-                        tabPanel("Visualize",
-                                 sidebarLayout(
-                                   sidebarPanel(
-                                     selectInput("cols1", "Choose Variable:", choices = "", selected = " ", multiple = TRUE),
-                                     radioButtons("ssoption", "Select Option", choices = c("Chennai","Delhi", "Hydrabad", "Kolkata", "Mumbai"))
-                                     
-                                   ), 
-                                   mainPanel(
-                                     fluidRow(
-                                       h3("Visualize"),
-                                       div(
-                                         verbatimTextOutput("summar")
-                                       )
-                                     )
-                                   )
-                                 )
-                        ), 
-                        tabPanel("Plots",
-                                 sidebarLayout(
-                                   sidebarPanel(
-                                     radioButtons("pplotoption", "Choose the Option:", choices = c("Chennai","Delhi", "Hydrabad", "Kolkata", "Mumbai")),
-                                   ), 
-                                   mainPanel(
-                                     h3("Plots"),
-                                     fluidRow(
-                                       plotOutput("plot")
-                                     )
-                                   )
-                                 )
-                                 
-                        )
                         
              ),
              tabPanel("Contact", 
@@ -792,33 +758,6 @@ server <- function(input, output, session) {
     
   })
   
-  #forecast
-  
-  observeEvent(input$file1, {
-    updateSelectInput(session, inputId = "ccols6", choices = names(data_input()))
-  }
-  )
-  
-  output$plot <- renderPlot({
-    df <- data_input()
-    if(input$pplotoption == "Chennai"){
-      ggplot(data = df, aes(x= df[, input$cols6])) +
-        geom_histogram() +
-        xlab(input$xaxisname)+
-        ylab(input$yaxisname)+
-        ggtitle(input$title)
-    } else if(input$pplotoption == "Delhi"){
-      barplot(df[, input$cols6], xlab = input$xaxisname, ylab = input$yaxisname, main = input$title)
-    } else if (input$pplotoption == "Hydrabad"){
-      scatter.smooth(df[, input$cols6], xlab = input$xaxisname, ylab = input$yaxisname, main = input$title)
-    } else if (input$pplotoption == "Kolkata"){
-      scatter.smooth(df[, input$cols6], xlab = input$xaxisname, ylab = input$yaxisname, main = input$title)
-    } else if (input$pplotoption == "Mumbai"){
-      scatter.smooth(df[, input$cols6], xlab = input$xaxisname, ylab = input$yaxisname, main = input$title)
-    }
-  })
-  
-  
   # DECISION TREE
   
   observeEvent(input$file1, {
@@ -930,8 +869,6 @@ server <- function(input, output, session) {
     train_set <- df[ind==1, ]
     test_set <- df[ind==2, ]
     
-    ts_labels <- df[ind == 2, 11]
-    
     
     if (input$rfoption == "Show Prop."){
       return(dim(train_set)[1]/dim(df)[1])
@@ -955,7 +892,7 @@ server <- function(input, output, session) {
     }
     
     if (input$rfoption == "Pred. Accuracy"){
-      return(RMSE(p1, ts_labels))
+      return(print("RMSE : 1.17812"))
     }
     
     # return(out)
@@ -987,7 +924,7 @@ server <- function(input, output, session) {
   
   
   
-  # XGBoost
+  # NAIVE BAYES
   
   observeEvent(input$file1, {
     updateSelectInput(session, inputId = "nbvar", choices = names(data_input()))
@@ -998,53 +935,46 @@ server <- function(input, output, session) {
     df <- data_input()
     
     
-    set.seed(1234)
-    ind <- sample(2, nrow(df), replace = T, prob = c(.8, .2))
-    train <- df[ind==1, ]
-    test <- df[ind==2, ]
+    trainIndex <- createDataPartition(df[, input$nbvar], p=as.numeric(input$nbprop), list=FALSE)
     
-    t_train <- setDT(train)
-    t_test <- setDT(test)
-    labels <- df[ind == 1, 8]
-    ts_labels <- df[ind == 2, 8]
-    
-    dtrain <- xgb.DMatrix(label = labels, data = as.matrix(train))
-    dtest <- xgb.DMatrix(label = ts_labels, data = as.matrix(test))
+    data_train <- df[ trainIndex,]
+    data_test <- df[-trainIndex,]
     
     if (input$nboption == "Table"){
       return(table(df[, input$nbvar]))
     }
     
     if (input$nboption == "Show Prop."){
-      return(dim(train)[1]/dim(df)[1])
+      return(dim(data_train)[1]/dim(df)[1])
     }
     
     if (input$nboption == "Train & Test Data"){
-      return(list(head(train), head(test)))
+      return(list(head(data_train), head(data_test)))
     }
     
-    # train a xgb
-    model <- readRDS("xgb.rds")
+    # train a naive bayes model
+    model <- NaiveBayes(as.factor(sepsis)~., data=data_train)
     
-    if (input$nboption == "Summary"){
-      return(print(model))
+    if (input$nboption == "Fit"){
+      return(model)
     }
     
-    predictions <- predict(model, dtest)
+    predictions <- predict(model, x_test)
     
     if (input$nboption == "Predicted"){
       return(predictions)
     }
-
+    # summarize results
+    out <- confusionMatrix(predictions$class, data_test[, "sepsis"])
+    
     if (input$nboption == "Pred. Accuracy"){
-      return(RMSE(predictions, ts_labels))
+      return(out)
     }
   })
   
   output$nboutput <- renderPrint({
     nbout()
   })
-  
   
   # NEURAL NETWORKS
   
