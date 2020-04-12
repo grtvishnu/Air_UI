@@ -921,7 +921,7 @@ server <- function(input, output, session) {
   
   
   
-  # NAIVE BAYES
+  # XGBoost
   
   observeEvent(input$file1, {
     updateSelectInput(session, inputId = "nbvar", choices = names(data_input()))
@@ -931,26 +931,35 @@ server <- function(input, output, session) {
     
     df <- data_input()
     
+    set.seed(1234)
+    ind <- sample(2, nrow(df), replace = T, prob = c(.8, .2))
+    train <- df[ind==1, ]
+    test <- df[ind==2, ]
     
-    trainIndex <- createDataPartition(df[, input$nbvar], p=as.numeric(input$nbprop), list=FALSE)
+    t_train <- setDT(train)
+    t_test <- setDT(test)
+    labels <- df[ind == 1, 8]
+    ts_labels <- df[ind == 2, 8]
     
-    data_train <- df[ trainIndex,]
-    data_test <- df[-trainIndex,]
+    
+    dtrain <- xgb.DMatrix(label = labels, data = as.matrix(train))
+    dtest <- xgb.DMatrix(label = ts_labels, data = as.matrix(test))
+    
     
     if (input$nboption == "Table"){
       return(table(df[, input$nbvar]))
     }
     
     if (input$nboption == "Show Prop."){
-      return(dim(data_train)[1]/dim(df)[1])
+      return(dim(train)[1]/dim(df)[1])
     }
     
     if (input$nboption == "Train & Test Data"){
-      return(list(head(data_train), head(data_test)))
+      return(list(head(train), head(test)))
     }
     
-    # train a naive bayes model
-    model <- NaiveBayes(as.factor(sepsis)~., data=data_train)
+    # train xgb
+    model <- readRDS("xgb.rds")
     
     if (input$nboption == "Fit"){
       return(model)
