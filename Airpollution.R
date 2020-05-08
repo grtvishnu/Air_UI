@@ -119,24 +119,6 @@ ui <- fluidPage(
              
              navbarMenu("Supervised Learning",
                         
-                        tabPanel("Deep Learning",
-                                 sidebarLayout(
-                                   sidebarPanel(
-                                     selectInput("dtyname", "Select Variable", choices = "", selected = ""),
-                                     textInput("dtprop", "Select Proportion", value = 0.7, placeholder = "Percentage of rows"),
-                                     radioButtons("dtoption", "Select Method", choices = c("No Option", "Table", "Show Prop.", "Train & Test Data", "Fit", "Predicted", "Pred. Accuracy")), 
-                                     radioButtons("dtplot", "Select Plot", choices = c("No Plot", "QPlot", "DTree")),
-                                     hr(),
-                                     helpText("Variable selected must be categorical and numerical."),
-                                     hr(),
-                                     a(href="http://mlwiki.org/index.php/Decision_Tree_Exercises", "Decision Trees")
-                                   ),
-                                   mainPanel(
-                                     div(verbatimTextOutput("dtoutput")),
-                                     div(plotOutput("dtplot"))     
-                                   )
-                                 )
-                        ),
                         tabPanel("Random Forests", 
                                  sidebarLayout(
                                    sidebarPanel(
@@ -198,6 +180,7 @@ ui <- fluidPage(
                         
                         
              ),
+             
              tabPanel("Contact", 
                       sidebarLayout(
                         sidebarPanel(
