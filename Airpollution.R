@@ -125,7 +125,7 @@ ui <- fluidPage(
                                      selectInput("rfvar", "Select Variable", choices = "", selected = ""),
                                      
                                      textInput("rfprop", "Select Proportion", value = 0.8, placeholder = "Percentage of rows"),
-                                     radioButtons("rfoption", "Select Method", choices = c("No Option", "Show Prop.", "Train & Test Data", "Model Summary", "Pred. Accuracy", "Plot")),
+                                     radioButtons("rfoption", "Select Method", choices = c("No Option", "Show Prop.", "Train & Test Data", "Importance", "Pred. Accuracy", "Summary")),
                                      hr(),
                                      helpText("Variable selected must be Non NA ."),
                                      hr(),
@@ -144,7 +144,7 @@ ui <- fluidPage(
                                      
                                      textInput("nbprop", "Select Proportion", value = 0.8, placeholder = "Percentage of rows"),
                                      textInput("nbyname", "Class Variable", value = "sepsis", placeholder = "Class Variable"),
-                                     radioButtons("nboption", "Select Method", choices = c("No Option", "Table", "Show Prop.", "Train & Test Data", "Fit", "Summary", "Predicted", "Pred. Accuracy")),
+                                     radioButtons("nboption", "Select Method", choices = c("No Option", "Table", "Show Prop.", "Train & Test Data", "Fit", "Importence", "Predicted", "Pred. Accuracy")),
                                      hr(),
                                      helpText("Variable selected must be categorical and numerical."),
                                      hr(),
@@ -867,35 +867,19 @@ server <- function(input, output, session) {
       return(rf_fit)
     }
     
-    if (input$rfoption == "Summary"){
-      return(print(rf_fit))
+    if (input$rfoption == "Importance"){
+      return(rf_fit$importance)
     }
     
     if (input$rfoption == "Pred. Accuracy"){
-      return(print("RMSE : 1.17812"))
+      return(RMSE(p1, test_set$PM25))
     }
-    
+    if (input$rfoption == "Summary"){
+      return(rf_fit)
+    }
     # return(out)
   })
-  output$image2 <- renderImage({
-    if (is.null(input$picture))
-      return(NULL)
-    
-    if (input$rfoption == "Plot") {
-      return(list(
-        src = "Rplot.png",
-        contentType = "image/png",
-        alt = "Plot"
-      ))
-    } else if (input$rfoption == "Accuracy") {
-      return(list(
-        src = "Rplot1.png",
-        filetype = "image/png",
-        alt = "Accuracy"
-      ))
-    }
-    
-  }, deleteFile = FALSE)
+  
   
   output$rfoutput <- renderPrint({
     rfout()
@@ -948,16 +932,16 @@ server <- function(input, output, session) {
       return(model)
     }
     
-    predictions <- predict(model, x_test)
+    predictions <- predict(model, dtest)
     
     if (input$nboption == "Predicted"){
       return(predictions)
     }
     # summarize results
-    out <- confusionMatrix(predictions$class, data_test[, "sepsis"])
+  
     
     if (input$nboption == "Pred. Accuracy"){
-      return(out)
+      return(RMSE(predictions,ts_labels))
     }
   })
   
