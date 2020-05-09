@@ -143,8 +143,7 @@ ui <- fluidPage(
                                      selectInput("nbvar", "Select Variable", choices = "", selected = ""),
                                      
                                      textInput("nbprop", "Select Proportion", value = 0.8, placeholder = "Percentage of rows"),
-                                     textInput("nbyname", "Class Variable", value = "sepsis", placeholder = "Class Variable"),
-                                     radioButtons("nboption", "Select Method", choices = c("No Option", "Table", "Show Prop.", "Train & Test Data", "Fit", "Importance", "Pred. Accuracy")),
+                                     radioButtons("nboption", "Select Method", choices = c("No Option", "Show Prop.", "Train & Test Data", "Fit", "Importance", "Pred. Accuracy")),
                                      hr(),
                                      helpText("Variable selected must be categorical and numerical."),
                                      hr(),
