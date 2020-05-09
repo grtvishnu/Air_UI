@@ -144,7 +144,7 @@ ui <- fluidPage(
                                      
                                      textInput("nbprop", "Select Proportion", value = 0.8, placeholder = "Percentage of rows"),
                                      textInput("nbyname", "Class Variable", value = "sepsis", placeholder = "Class Variable"),
-                                     radioButtons("nboption", "Select Method", choices = c("No Option", "Table", "Show Prop.", "Train & Test Data", "Fit", "Importence", "Predicted", "Pred. Accuracy")),
+                                     radioButtons("nboption", "Select Method", choices = c("No Option", "Table", "Show Prop.", "Train & Test Data", "Fit", "Importance", "Pred. Accuracy")),
                                      hr(),
                                      helpText("Variable selected must be categorical and numerical."),
                                      hr(),
@@ -933,9 +933,10 @@ server <- function(input, output, session) {
     }
     
     predictions <- predict(model, dtest)
+    importance_matrix <- xgb.importance(model = model)
     
-    if (input$nboption == "Predicted"){
-      return(predictions)
+    if (input$nboption == "Importance"){
+      return(importance_matrix)
     }
     # summarize results
   
